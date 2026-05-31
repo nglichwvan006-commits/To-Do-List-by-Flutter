@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
     final completedTasks = tasks.where((tasks) => tasks.isCompleted).toList();
     final tongSoTask = tasks.length;
     final soTaskDaHoanThanh = completedTasks.length;
-    final tienDo = tongSoTask ==0 ? 0.0 : soTaskDaHoanThanh / tongSoTask;
+    final tienDo = tongSoTask ==0 ? 0.0 : soTaskDaHoanThanh / tongSoTask; //TÍNH TIẾN ĐỘ
     return Scaffold(
       backgroundColor: Color(0xFFF4F0FF),
       body: SafeArea(
