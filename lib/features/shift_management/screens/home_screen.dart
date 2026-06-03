@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_list/features/shift_management/models/task_model.dart';
 import 'package:to_do_list/features/shift_management/widgets/task_card.dart';
@@ -52,6 +53,13 @@ class _HomePageState extends State<HomePage> {
       isCompleted: false,
     ),
   ];
+  String selectedCategory = "Tất Cả"; //PHÂN LOẠI DANH SÁCH CÔNG VIỆC, MẶC ĐỊNH LÀ TẤT CẢ
+  final List<String> categories = [
+    "Tất Cả",
+    'Học tập',
+    'Sức khỏe',
+    'Công việc',
+  ];
   void chuyenDoiTrangThaiTask(String taskID, bool isCompleted) {  //KHI BẤM TASK THÌ VALUE THÀNH 1 VÀ TRUYỀN VÀO HÀM ĐỂ THAY ĐỔI TRẠNG THÁI
     final index = tasks.indexWhere((task) => taskID==task.id);
 
@@ -68,6 +76,9 @@ class _HomePageState extends State<HomePage> {
     final tongSoTask = tasks.length;
     final soTaskDaHoanThanh = completedTasks.length;
     final tienDo = tongSoTask ==0 ? 0.0 : soTaskDaHoanThanh / tongSoTask; //TÍNH TIẾN ĐỘ
+    final filteredTasks = selectedCategory == "Tất Cả" ? tasks : tasks.where((task) => task.category == selectedCategory).toList();
+    final taskChuaHoanThanh = filteredTasks.where((task) => !task.isCompleted).toList(); 
+    final taskDaHoanThanh = filteredTasks.where((task) => task.isCompleted).toList();
     return Scaffold(
       backgroundColor: Color(0xFFF4F0FF),
       body: SafeArea(
@@ -128,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(22),
                       backgroundColor: const Color(0xFFEDE9FE),
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(0xFF8B5CF6)
+                        Color.fromARGB(255, 209, 53, 196)
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -144,6 +155,53 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 24),
+              //PHÂN LOẠI
+              const Text("Danh Mục",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2D264B),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: categories.map((category) {
+                    final isSelected = selectedCategory == category; //NẾU CATEGORY ĐÃ CHỌN GIỐNG VỚI CATEGORY HIỆN TẠI THÌ TRẢ TRUE
+
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: ChoiceChip(
+                        label: Text(category),
+                        selected: isSelected,
+                        selectedColor: const Color(0xFF8B5CF6),
+                        backgroundColor: Colors.white,
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF2D264B),
+                          fontWeight: FontWeight.w600,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(
+                            color: isSelected
+                                ? const Color(0xFF8B5CF6)
+                                : const Color(0xFFE0D7F8),
+                          ),
+                        ),
+                        onSelected: (selected) {
+                          setState(() {
+                            selectedCategory = category; //KHI USER CHỌN CATE NÀO THÌ SẼ GẮN CATE ĐÓ VÀO VAR ISSELECTED
+                          });
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 8),
               Expanded(
                 child: ListView(
                   children: [
@@ -158,7 +216,7 @@ class _HomePageState extends State<HomePage> {
 
                     const SizedBox(height: 12),
 
-                    ...pendingTasks.map((task) {  //.map() DÙNG ĐỂ BIẾN LIST NÀY THÀNH LIST KHÁC
+                    ...taskChuaHoanThanh.map((task) {  //.map() DÙNG ĐỂ BIẾN LIST NÀY THÀNH LIST KHÁC
                       return TaskCard(
                         title: task.title,
                         category: task.category,
@@ -184,7 +242,7 @@ class _HomePageState extends State<HomePage> {
 
                     const SizedBox(height: 12),
 
-                    ...completedTasks.map((task) {  //DÙNG ... ĐỂ CHO LISTVIEW BIẾT NÓ LÀ WIGET
+                    ...taskDaHoanThanh.map((task) {  //DÙNG ... ĐỂ CHO LISTVIEW BIẾT NÓ LÀ WIGET
                       return TaskCard(
                         title: task.title,
                         category: task.category,
